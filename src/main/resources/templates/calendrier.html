@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Calendrier')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar('calendrier')}"></header>
+
+<main class="container">
+    <div class="page-header">
+        <div>
+            <h1>Calendrier</h1>
+            <p class="muted">Séances planifiées, avec date et heure</p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/seances/nouvelle}">+ Planifier une séance</a>
+    </div>
+
+    <div class="card">
+        <div class="cal-toolbar">
+            <a class="btn btn-sm btn-secondary" th:href="@{/calendrier(mois=${precedent})}">&laquo; Précédent</a>
+            <h2 th:text="${titreMois}">Novembre 2026</h2>
+            <div>
+                <a class="btn btn-sm btn-secondary" th:href="@{/calendrier(mois=${moisActuel})}">Aujourd'hui</a>
+                <a class="btn btn-sm btn-secondary" th:href="@{/calendrier(mois=${suivant})}">Suivant &raquo;</a>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="calendrier">
+                <thead>
+                <tr>
+                    <th>Lun</th><th>Mar</th><th>Mer</th><th>Jeu</th><th>Ven</th><th>Sam</th><th>Dim</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="semaine : ${semaines}">
+                    <td th:each="j : ${semaine}"
+                        th:classappend="${(j.dansMois ? '' : 'hors-mois ') + (j.aujourdhui ? 'aujourdhui' : '')}">
+                        <div class="cal-jour" th:text="${j.date.dayOfMonth}">1</div>
+                        <a class="cal-seance" th:each="s : ${j.seances}"
+                           th:href="@{/seances/{id}/qr(id=${s.id})}"
+                           th:title="${s.titre + ' - ' + s.matiere + ' (' + s.enseignant.prenom + ' ' + s.enseignant.nom + ')'}">
+                            <span class="cal-heure" th:text="${#temporals.format(s.heureSeance, 'HH:mm')}">08:00</span>
+                            <span th:text="${s.titre}">Titre</span>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

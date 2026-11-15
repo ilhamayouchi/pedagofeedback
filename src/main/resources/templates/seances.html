@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Séances')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar('seances')}"></header>
+
+<main class="container">
+    <div class="page-header">
+        <div>
+            <h1>Séances</h1>
+            <p class="muted">Liste des séances pédagogiques</p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/seances/nouvelle}">+ Planifier une séance</a>
+    </div>
+
+    <div th:replace="~{fragments :: messages}"></div>
+
+    <div class="card">
+        <div class="table-wrap" th:if="${not #lists.isEmpty(seances)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Matière</th>
+                    <th>Date et heure</th>
+                    <th>Enseignant</th>
+                    <th>Méthode</th>
+                    <th class="col-actions">Évaluation</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${seances}">
+                    <td class="strong" th:text="${s.titre}"></td>
+                    <td th:text="${s.matiere}"></td>
+                    <td th:text="${#temporals.format(s.dateHeure, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${s.enseignant.prenom + ' ' + s.enseignant.nom}"></td>
+                    <td th:text="${s.methodePedagogique}"></td>
+                    <td class="col-actions">
+                        <span class="badge badge-warning" th:unless="${s.evaluable}">À venir</span>
+                        <a class="btn btn-sm btn-primary"
+                           th:href="@{/seances/{id}/qr(id=${s.id})}">QR code</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="empty" th:if="${#lists.isEmpty(seances)}">Aucune séance enregistrée pour le moment.</p>
+    </div>
+</main>
+</body>
+</html>

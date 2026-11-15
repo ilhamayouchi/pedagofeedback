@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('QR code')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar('seances')}"></header>
+
+<main class="container container-narrow">
+    <div class="page-header">
+        <div>
+            <h1>QR code d'évaluation</h1>
+            <p class="muted"
+               th:text="${seance.titre + ' · ' + #temporals.format(seance.dateHeure, 'dd/MM/yyyy HH:mm')}"></p>
+        </div>
+        <a class="btn btn-secondary" th:href="@{/seances}">Retour</a>
+    </div>
+
+    <div class="alert alert-warning" th:unless="${seance.evaluable}">
+        Cette séance n'a pas encore eu lieu : le formulaire s'ouvrira à partir de sa date et de son heure.
+    </div>
+
+    <div class="card qr-box">
+        <img th:src="@{/seances/{id}/qr.png(id=${seance.id})}" alt="QR code de la séance">
+        <p class="muted"> Évaluer la séance de façon anonyme.</p>
+        <div class="lien" th:text="${lien}"></div>
+
+    </div>
+</main>
+</body>
+</html>

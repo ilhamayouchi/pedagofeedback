@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Tableau de bord')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar('dashboard')}"></header>
+
+<main class="container">
+    <div class="page-header">
+        <div>
+            <h1>Tableau de bord</h1>
+            <p class="muted">
+                <span class="strong" th:text="${enseignant.prenom + ' ' + enseignant.nom}"></span> ·
+                <span th:text="${enseignant.specialite}"></span>
+            </p>
+        </div>
+        <a class="btn btn-secondary" sec:authorize="hasRole('ADMIN')"
+           th:href="@{/enseignants}">Retour aux enseignants</a>
+    </div>
+
+    <div class="alert alert-info" th:if="${moyennes.total == 0}">
+        Aucun feedback n'a encore été reçu pour les séances de cet enseignant.
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <h2>Moyennes par critère</h2>
+            <span class="badge badge-info" th:text="${moyennes.total + ' feedback(s)'}"></span>
+        </div>
+
+        <div class="bar-row">
+            <span class="bar-label">Clarté</span>
+            <div class="bar"><div class="bar-fill fill-clarte" th:style="|width:${moyennes.clartePct()}%|"></div></div>
+            <span class="bar-value"
+                  th:text="${moyennes.clarte != null ? #numbers.formatDecimal(moyennes.clarte, 1, 1) + ' / 5' : '—'}"></span>
+        </div>
+        <div class="bar-row">
+            <span class="bar-label">Interactivité</span>
+            <div class="bar"><div class="bar-fill fill-interactivite" th:style="|width:${moyennes.interactivitePct()}%|"></div></div>
+            <span class="bar-value"
+                  th:text="${moyennes.interactivite != null ? #numbers.formatDecimal(moyennes.interactivite, 1, 1) + ' / 5' : '—'}"></span>
+        </div>
+        <div class="bar-row">
+            <span class="bar-label">Utilité</span>
+            <div class="bar"><div class="bar-fill fill-utilite" th:style="|width:${moyennes.utilitePct()}%|"></div></div>
+            <span class="bar-value"
+                  th:text="${moyennes.utilite != null ? #numbers.formatDecimal(moyennes.utilite, 1, 1) + ' / 5' : '—'}"></span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><h2>Résultats par séance</h2></div>
+
+        <div class="table-wrap" th:if="${not #lists.isEmpty(stats)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Séance</th>
+                    <th>Date</th>
+                    <th>Clarté</th>
+                    <th>Interactivité</th>
+                    <th>Utilité</th>
+                    <th>Feedbacks</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${stats}">
+                    <td>
+                        <span class="strong" th:text="${s.titre}"></span><br>
+                        <span class="muted small" th:text="${s.matiere}"></span>
+                    </td>
+                    <td th:text="${#temporals.format(s.dateSeance, 'dd/MM/yyyy')}"></td>
+                    <td class="cell-bar">
+                        <span th:text="${s.clarte != null ? #numbers.formatDecimal(s.clarte, 1, 1) : '—'}"></span>
+                        <div class="bar bar-sm"><div class="bar-fill fill-clarte" th:style="|width:${s.clartePct()}%|"></div></div>
+                    </td>
+                    <td class="cell-bar">
+                        <span th:text="${s.interactivite != null ? #numbers.formatDecimal(s.interactivite, 1, 1) : '—'}"></span>
+                        <div class="bar bar-sm"><div class="bar-fill fill-interactivite" th:style="|width:${s.interactivitePct()}%|"></div></div>
+                    </td>
+                    <td class="cell-bar">
+                        <span th:text="${s.utilite != null ? #numbers.formatDecimal(s.utilite, 1, 1) : '—'}"></span>
+                        <div class="bar bar-sm"><div class="bar-fill fill-utilite" th:style="|width:${s.utilitePct()}%|"></div></div>
+                    </td>
+                    <td th:text="${s.nbFeedbacks}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="empty" th:if="${#lists.isEmpty(stats)}">Cet enseignant n'a encore aucune séance.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><h2>Commentaires anonymes</h2></div>
+
+        <ul class="comments" th:if="${not #lists.isEmpty(commentaires)}">
+            <li th:each="c : ${commentaires}">
+                <p th:text="${c.commentaire}"></p>
+                <span class="muted small"
+                      th:text="${c.seance.titre + ' · ' + #temporals.format(c.dateFeedback, 'dd/MM/yyyy HH:mm')}"></span>
+            </li>
+        </ul>
+        <p class="empty" th:if="${#lists.isEmpty(commentaires)}">Aucun commentaire pour le moment.</p>
+    </div>
+</main>
+</body>
+</html>

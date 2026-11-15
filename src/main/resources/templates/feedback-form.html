@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Évaluer une séance')}"></head>
+<body>
+<header th:replace="~{fragments :: navbarPublic}"></header>
+
+<main class="container container-narrow">
+    <div class="page-header">
+        <div>
+            <h1>Évaluer la séance</h1>
+            <p class="muted">Formulaire anonyme</p>
+        </div>
+    </div>
+
+    <div class="card seance-info">
+        <h2 th:text="${seance.titre}"></h2>
+        <p class="muted">
+            <span th:text="${seance.matiere}"></span> ·
+            <span th:text="${#temporals.format(seance.dateHeure, 'dd/MM/yyyy HH:mm')}"></span> ·
+            <span th:text="${seance.enseignant.prenom + ' ' + seance.enseignant.nom}"></span>
+        </p>
+        <p th:text="${seance.objectifPedagogique}"></p>
+    </div>
+
+    <div class="alert alert-info">
+        Ce formulaire est anonyme : aucun nom, adresse électronique ou identifiant n'est enregistré.
+    </div>
+
+    <div class="card">
+        <form th:action="@{/evaluer/{jeton}(jeton=${seance.jeton})}" th:object="${feedbackForm}"
+              method="post" novalidate>
+
+            <div class="field">
+                <label>Clarté de la séance</label>
+                <div class="rating">
+                    <label th:each="i : ${#numbers.sequence(1, 5)}">
+                        <input type="radio" th:field="*{clarte}" th:value="${i}">
+                        <span th:text="${i}">1</span>
+                    </label>
+                </div>
+                <div class="error" th:if="${#fields.hasErrors('clarte')}" th:errors="*{clarte}"></div>
+            </div>
+
+            <div class="field">
+                <label>Interactivité</label>
+                <div class="rating">
+                    <label th:each="i : ${#numbers.sequence(1, 5)}">
+                        <input type="radio" th:field="*{interactivite}" th:value="${i}">
+                        <span th:text="${i}">1</span>
+                    </label>
+                </div>
+                <div class="error" th:if="${#fields.hasErrors('interactivite')}" th:errors="*{interactivite}"></div>
+            </div>
+
+            <div class="field">
+                <label>Utilité</label>
+                <div class="rating">
+                    <label th:each="i : ${#numbers.sequence(1, 5)}">
+                        <input type="radio" th:field="*{utilite}" th:value="${i}">
+                        <span th:text="${i}">1</span>
+                    </label>
+                </div>
+                <div class="error" th:if="${#fields.hasErrors('utilite')}" th:errors="*{utilite}"></div>
+            </div>
+
+            <p class="muted small">Échelle : 1 = très insuffisant, 5 = excellent.</p>
+
+            <div class="field">
+                <label for="commentaire">Suggestion ou commentaire (facultatif)</label>
+                <textarea id="commentaire" rows="4" th:field="*{commentaire}"></textarea>
+                <div class="error" th:if="${#fields.hasErrors('commentaire')}" th:errors="*{commentaire}"></div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Envoyer mon feedback</button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Enseignants')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar('enseignants')}"></header>
+
+<main class="container">
+    <div class="page-header">
+        <div>
+            <h1>Enseignants</h1>
+            <p class="muted">Gestion des enseignants et de leurs comptes</p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/enseignants/nouveau}">+ Ajouter un enseignant</a>
+    </div>
+
+    <div th:replace="~{fragments :: messages}"></div>
+
+    <div class="card">
+        <div class="table-wrap" th:if="${not #lists.isEmpty(enseignants)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Spécialité</th>
+                    <th>Identifiant</th>
+                    <th class="col-actions">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${enseignants}">
+                    <td class="strong" th:text="${e.nom}"></td>
+                    <td th:text="${e.prenom}"></td>
+                    <td th:text="${e.specialite}"></td>
+                    <td>
+                        <span th:text="${e.username != null ? e.username : '— (à définir)'}"></span>
+                        <span class="badge badge-info" th:if="${e.role == 'ADMIN'}">Admin</span>
+                    </td>
+                    <td class="col-actions">
+                        <a class="btn btn-sm btn-primary"
+                           th:href="@{/dashboard/{id}(id=${e.id})}">Tableau de bord</a>
+                        <a class="btn btn-sm btn-secondary"
+                           th:href="@{/enseignants/{id}/modifier(id=${e.id})}">Modifier</a>
+                        <form class="inline" th:unless="${e.role == 'ADMIN'}"
+                              th:action="@{/enseignants/{id}/supprimer(id=${e.id})}" method="post"
+                              onsubmit="return confirm('Supprimer cet enseignant ?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="empty" th:if="${#lists.isEmpty(enseignants)}">Aucun enseignant enregistré pour le moment.</p>
+    </div>
+</main>
+</body>
+</html>

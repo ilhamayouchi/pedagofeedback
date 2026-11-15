@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Évaluation indisponible')}"></head>
+<body>
+<header th:replace="~{fragments :: navbarPublic}"></header>
+
+<main class="container container-narrow">
+    <div class="card centre">
+        <h1>Évaluation indisponible</h1>
+        <div class="alert alert-warning" th:text="${message}"></div>
+    </div>
+</main>
+</body>
+</html>

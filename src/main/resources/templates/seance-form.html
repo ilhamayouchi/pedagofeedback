@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Planifier une séance')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar('seances')}"></header>
+
+<main class="container container-narrow">
+    <div class="page-header">
+        <div>
+            <h1>Planifier une séance</h1>
+            <p class="muted" th:unless="${estAdmin}">Cette séance sera associée à votre compte.</p>
+            <p class="muted" th:if="${estAdmin}">Chaque séance est associée à un enseignant.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <form th:action="@{/seances/nouvelle}" th:object="${seanceForm}" method="post" novalidate>
+
+            <div class="field">
+                <label for="titre">Titre</label>
+                <input type="text" id="titre" th:field="*{titre}">
+                <div class="error" th:if="${#fields.hasErrors('titre')}" th:errors="*{titre}"></div>
+            </div>
+
+            <div class="field">
+                <label for="matiere">Matière</label>
+                <input type="text" id="matiere" th:field="*{matiere}">
+                <div class="error" th:if="${#fields.hasErrors('matiere')}" th:errors="*{matiere}"></div>
+            </div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <label for="dateSeance">Date</label>
+                    <input type="date" id="dateSeance" th:field="*{dateSeance}">
+                    <div class="error" th:if="${#fields.hasErrors('dateSeance')}" th:errors="*{dateSeance}"></div>
+                </div>
+                <div class="field">
+                    <label for="heureSeance">Heure</label>
+                    <input type="time" id="heureSeance" th:field="*{heureSeance}">
+                    <div class="error" th:if="${#fields.hasErrors('heureSeance')}" th:errors="*{heureSeance}"></div>
+                </div>
+            </div>
+
+            <!-- Visible seulement pour l'admin -->
+            <div class="field" th:if="${estAdmin}">
+                <label for="enseignantId">Enseignant</label>
+                <select id="enseignantId" th:field="*{enseignantId}">
+                    <option value="">-- Choisir un enseignant --</option>
+                    <option th:each="e : ${enseignants}" th:value="${e.id}"
+                            th:text="${e.prenom + ' ' + e.nom + ' (' + e.specialite + ')'}"></option>
+                </select>
+                <div class="error" th:if="${#fields.hasErrors('enseignantId')}" th:errors="*{enseignantId}"></div>
+            </div>
+
+            <div class="field">
+                <label for="methodePedagogique">Méthode pédagogique</label>
+                <input type="text" id="methodePedagogique" th:field="*{methodePedagogique}"
+                       placeholder="Cours magistral, TD, TP, étude de cas...">
+                <div class="error" th:if="${#fields.hasErrors('methodePedagogique')}" th:errors="*{methodePedagogique}"></div>
+            </div>
+
+            <div class="field">
+                <label for="objectifPedagogique">Objectif pédagogique</label>
+                <textarea id="objectifPedagogique" rows="4" th:field="*{objectifPedagogique}"></textarea>
+                <div class="error" th:if="${#fields.hasErrors('objectifPedagogique')}" th:errors="*{objectifPedagogique}"></div>
+            </div>
+
+            <div class="form-actions">
+                <a class="btn btn-secondary" th:href="@{/seances}">Annuler</a>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>
