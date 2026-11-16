@@ -147,7 +147,6 @@ La table `feedback` ne contient **aucune colonne** permettant d'identifier un é
 - **Moteur de templates** : Thymeleaf (avec l'extension Spring Security)
 - **Base de données** : MySQL (XAMPP et phpMyAdmin en local)
 - **QR code** : ZXing
-- **Conteneurisation** : Docker (pour le déploiement)
 - **Outils de développement** : IntelliJ IDEA, Maven, Git et GitHub
 
 ## Structure du projet
