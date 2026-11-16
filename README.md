@@ -1,8 +1,24 @@
 # PedagoFeedback
 
-Application web d'évaluation des séances d'enseignement par les étudiants.  
+Application web d'évaluation des séances d'enseignement par les étudiants.
 Les enseignants planifient leurs séances, partagent un **QR code** ou un **lien** aux étudiants, et consultent les résultats agrégés dans un tableau de bord.
 
+> Mini-projet Web (JEE) : Spring Boot + Thymeleaf
+> Réalisé par : **ilham ayouchi**, encadré par : **Pr.Mohammed Laghgar**
+
+---
+
+## Sommaire
+
+- [Problématique](#problématique)
+- [Objectif](#objectif)
+- [Fonctionnalités](#fonctionnalités)
+- [Règles de gestion](#règles-de-gestion)
+- [Les diagrammes UML](#les-diagrammes-uml)
+- [Modèle de données](#modèle-de-données)
+- [Technologies](#technologies)
+- [Structure du projet](#structure-du-projet)
+- [Démonstration](#démonstration)
 
 ---
 
@@ -18,14 +34,23 @@ Concevoir une application web permettant aux étudiants d'évaluer les séances 
 
 ## Fonctionnalités
 
+### Demandées par le cahier des charges
+
 - **Gérer les enseignants** (réservé au compte administrateur).
 - **Planifier et enregistrer les séances**, chaque séance étant associée à un enseignant.
-- **Partager le formulaire d'évaluation** par **QR code** ou par **lien** unique (jeton propre à chaque séance).
+- **Partager le formulaire d'évaluation** par **QR code** ou par **lien**, avec un jeton unique propre à chaque séance.
 - **Évaluer une séance** sur trois critères : clarté, interactivité, utilité (notes de 1 à 5).
-- **Laisser un commentaire** pédagogique facultatif.
+- **Laisser un commentaire** pédagogique (facultatif).
 - **Calculer les moyennes** par critère et par séance.
-- **Tableau de bord** présentant les résultats agrégés.
-- **Gestion des rôles** : `ADMIN` et `ENSEIGNANT`.
+- **Tableau de bord** par enseignant, avec les résultats agrégés et des graphiques en barres des moyennes par critère.
+
+### Extensions ajoutées
+
+- **Connexion des enseignants** (Spring Security) : les étudiants n'ont jamais de compte, ce qui préserve l'anonymat.
+- **Gestion des rôles** : `ADMIN` et `ENSEIGNANT`. Un enseignant ne voit que ses propres séances et son propre tableau de bord.
+- **Heure de la séance** en plus de la date : une séance devient évaluable à partir de sa date **et** de son heure.
+- **Calendrier mensuel** des séances, avec la date et l'heure.
+- **QR code** généré pour chaque séance (bibliothèque ZXing).
 
 ## Règles de gestion
 
@@ -38,15 +63,18 @@ Concevoir une application web permettant aux étudiants d'évaluer les séances 
 - Sans mécanisme d'identification, le système ne garantit pas qu'un étudiant ne réponde qu'une seule fois.
 
 ---
+
 ## Les diagrammes UML
 
 ### Diagramme de cas d'utilisation
 
-<!-- Remplacer par votre image : ![Cas d'utilisation](docs/use-case.png) -->
+<img width="614" height="413" alt="image" src="https://github.com/user-attachments/assets/a48d1084-eaf8-4ac0-ac8a-93b9a1e7aa61" />
 
 ### Diagramme de classes
 
-<!-- Remplacer par votre image : ![Diagramme de classes](docs/class-diagram.png) -->
+<img width="758" height="247" alt="image" src="https://github.com/user-attachments/assets/279c036c-4436-48ec-8d5e-90728224e159" />
+
+---
 
 ## Modèle de données
 
@@ -57,7 +85,7 @@ Relations :
 
 | Table | Rôle |
 |---|---|
-| `enseignant` | Comptes des enseignants et de l'administrateur |
+| `enseignant` | Les comptes des enseignants et de l'administrateur |
 | `seance` | Séances d'enseignement planifiées |
 | `feedback` | Évaluations anonymes des étudiants |
 
@@ -72,10 +100,11 @@ CREATE TABLE `enseignant` (
   `prenom` VARCHAR(100) NOT NULL,
   `specialite` VARCHAR(100) NOT NULL,
   `email` VARCHAR(150) NOT NULL,
-  `username` VARCHAR(50) DEFAULT NULL,
+  `username` VARCHAR(50) DEFAULT NULL,       -- identifiant de connexion
   `mot_de_passe` VARCHAR(100) DEFAULT NULL,  -- haché avec BCrypt
   `role` VARCHAR(20) DEFAULT NULL,           -- ADMIN ou ENSEIGNANT
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`username`)
 );
 
 CREATE TABLE `seance` (
@@ -89,6 +118,7 @@ CREATE TABLE `seance` (
   `jeton` VARCHAR(40) DEFAULT NULL,          -- utilisé dans le lien et le QR code
   `enseignant_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY (`jeton`),
   FOREIGN KEY (`enseignant_id`) REFERENCES `enseignant`(`id`)
 );
 
@@ -105,14 +135,53 @@ CREATE TABLE `feedback` (
 );
 ```
 
+La table `feedback` ne contient **aucune colonne** permettant d'identifier un étudiant.
+
+---
 
 ## Technologies
 
-- **Langage** : Java
-- **Framework** : Spring Boot
+- **Langage** : Java 17
+- **Framework** : Spring Boot 3 (Spring MVC, Spring Data JPA, Bean Validation)
 - **Sécurité** : Spring Security, mots de passe hachés avec BCrypt
-- **Moteur de templates** : Thymeleaf
+- **Moteur de templates** : Thymeleaf (avec l'extension Spring Security)
 - **Base de données** : MySQL (XAMPP et phpMyAdmin en local)
-- **Outils de développement** : IntelliJ IDEA, Git et GitHub
+- **QR code** : ZXing
+- **Conteneurisation** : Docker (pour le déploiement)
+- **Outils de développement** : IntelliJ IDEA, Maven, Git et GitHub
 
-## Guide d'utilisation :
+## Structure du projet
+
+```
+pedagofeedback/
+├── pom.xml
+└── src/main/
+    ├── java/ma/ens/pedagofeedback/
+    │   ├── PedagoFeedbackApplication.java
+    │   ├── config/          SecurityConfig, DatabaseInitializer
+    │   ├── controllers/     Login, Home, Enseignant, Seance, Feedback, Dashboard, Calendrier
+    │   ├── dto/             SeanceForm, FeedbackForm, EnseignantForm, Moyennes, SeanceStat, CalendrierJour
+    │   ├── entities/        Enseignant, Seance, Feedback
+    │   ├── exception/       RegleGestionException
+    │   ├── repositories/    EnseignantRepository, SeanceRepository, FeedbackRepository
+    │   └── services/        Enseignant, Seance, Feedback, Statistique, QrCode, CustomUserDetails
+    └── resources/
+        ├── application.properties
+        ├── static/style.css
+        └── templates/       pages Thymeleaf (login, séances, calendrier, QR code, tableau de bord...)
+```
+
+---
+
+## Utilisation
+
+1. L'**administrateur** se connecte et crée les comptes des enseignants (menu Enseignants).
+2. Un **enseignant** se connecte et planifie une séance (titre, matière, date, heure, méthode, objectif).
+3. Il retrouve la séance dans la liste et le **calendrier**, puis clique sur **QR code**.
+4. Il projette le QR code (ou partage le lien) **après la séance**.
+5. Les **étudiants** le scannent avec leur téléphone, sans compte, et remplissent le formulaire anonyme.
+6. L'enseignant consulte son **tableau de bord** : moyennes par critère, résultats par séance, commentaires anonymes.
+
+## Démonstration
+
+https://github.com/user-attachments/assets/6f76005d-25c2-441e-b250-44c244789c01
