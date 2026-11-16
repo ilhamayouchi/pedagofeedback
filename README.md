@@ -72,7 +72,8 @@ Concevoir une application web permettant aux étudiants d'évaluer les séances 
 
 ### Diagramme de classes
 
-<img width="758" height="247" alt="image" src="https://github.com/user-attachments/assets/279c036c-4436-48ec-8d5e-90728224e159" />
+<img width="1513" height="492" alt="image" src="https://github.com/user-attachments/assets/5b649443-d588-4323-b1db-3b9eefffba26" />
+
 
 ---
 
